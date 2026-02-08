@@ -125,7 +125,7 @@ export class CriticAgent extends BaseAgent {
     output += `- Coherence Score: ${coherenceScore}%\n`
     output += `- Insight Count: Multiple\n\n`
 
-    output += `---\n**Synthesized Content Under Review:**\n${synthesisContent.substring(0, 500)}...`
+   output += `---\n**Full Synthesis Report:**\n\n${synthesisContent}`
 
     return output
   }
