@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { AgentMessage } from '@/lib/types'
+import { researchTopics, TopicCategory } from '@/lib/topics'
 
 interface AgentStatus {
   name: string
@@ -14,6 +15,8 @@ interface AgentStatus {
 
 export default function Home() {
   const [topic, setTopic] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [showTopics, setShowTopics] = useState(false)
   const [isResearching, setIsResearching] = useState(false)
   const [messages, setMessages] = useState<AgentMessage[]>([])
   const [finalReport, setFinalReport] = useState('')
@@ -27,6 +30,11 @@ export default function Home() {
     { name: 'Synthesizer', icon: '🧠', description: 'Combines insights and patterns', status: 'idle', messagesProcessed: 0, color: 'from-purple-500 to-purple-700' },
     { name: 'Critic', icon: '⚡', description: 'Evaluates quality and completeness', status: 'idle', messagesProcessed: 0, color: 'from-yellow-500 to-yellow-700' },
   ])
+
+  const selectTopic = (topicText: string) => {
+    setTopic(topicText)
+    setShowTopics(false)
+  }
 
   const startResearch = async () => {
     if (!topic.trim()) return
@@ -151,12 +159,49 @@ export default function Home() {
 
         {/* Research Input */}
         <div className="glass-morphism p-8 rounded-xl mb-8">
+          {/* Topic Templates Button */}
+          <div className="mb-4">
+            <button
+              onClick={() => setShowTopics(!showTopics)}
+              className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg font-medium transition-all flex items-center justify-center space-x-2"
+            >
+              <span>✨</span>
+              <span>Browse Popular Topics</span>
+              <span>{showTopics ? '▲' : '▼'}</span>
+            </button>
+          </div>
+
+          {/* Topic Categories */}
+          {showTopics && (
+            <div className="mb-6 space-y-4 max-h-96 overflow-y-auto bg-gray-800/50 p-4 rounded-lg">
+              {researchTopics.map((category: TopicCategory) => (
+                <div key={category.name} className="mb-4">
+                  <h3 className="text-lg font-bold mb-2 flex items-center space-x-2">
+                    <span>{category.icon}</span>
+                    <span>{category.name}</span>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {category.topics.map((topicText: string) => (
+                      <button
+                        key={topicText}
+                        onClick={() => selectTopic(topicText)}
+                        className="text-left px-4 py-2 bg-gray-700/50 hover:bg-blue-600/50 rounded-lg transition text-sm border border-gray-600 hover:border-blue-500"
+                      >
+                        → {topicText}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <input
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !isResearching && startResearch()}
-            placeholder="Enter research topic (e.g., 'Future of AI Agents')"
+            placeholder="Select a topic above or write your own..."
             className="w-full px-6 py-4 bg-gray-800/50 rounded-lg text-lg border-2 border-blue-500/50 focus:border-blue-500 focus:outline-none mb-4"
             disabled={isResearching}
           />
